@@ -3554,7 +3554,9 @@ ngx_http_upstream_check_init_main_conf(ngx_conf_t *cf, void *conf)
     ngx_uint_t                      i;
     ngx_http_upstream_srv_conf_t  **uscfp;
     ngx_http_upstream_main_conf_t  *umcf;
-
+    ngx_uint_t                      j;
+    ngx_http_upstream_server_t  *upset;
+    
     umcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_upstream_module);
 
     b = ngx_http_upstream_check_create_fastcgi_request(cf->pool,
@@ -3574,6 +3576,10 @@ ngx_http_upstream_check_init_main_conf(ngx_conf_t *cf, void *conf)
 
         if (ngx_http_upstream_check_init_srv_conf(cf, uscfp[i]) != NGX_OK) {
             return NGX_CONF_ERROR;
+        }
+        upset = uscfp[i]->servers->elts;
+        for (j = 0; j < uscfp[i]->servers->nelts; j++) {
+            ngx_http_upstream_check_add_peer(cf,uscfp[i], upset[j].addrs);
         }
     }
 
